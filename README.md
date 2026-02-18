@@ -437,7 +437,7 @@ KEY_ENCRYPTION_KEY=votre_cle_kek_de_32_caracteres_minimum_securisee
 SHARE_SECRET=votre_secret_hmac_pour_tokens_partage
 
 # Application
-APP_PUBLIC_BASE_URL=http://localhost:9081
+APP_PUBLIC_BASE_URL=http://localhost:9083
 ```
 
 > ️ **SÉCURITÉ** : Ne jamais committer le fichier `.env` ! Utilisez `.env.example` comme template.
@@ -450,9 +450,9 @@ Le fichier `docker-compose.yml` configure :
 - **Service `phpmyadmin`** : phpMyAdmin (latest)
 - **Volumes** : persistance BDD + fichiers
 - **Ports** :
-    - 9081 (web API)
+    - 9083 (web API)
     - 3306 (mysql)
-    - 8081 (phpmyadmin)
+    - 8083 (phpmyadmin)
 
 ---
 
@@ -469,13 +469,13 @@ docker ps
 ```
 
 L'API sera accessible sur :
-- **API** : `http://localhost:9081`
-- **phpMyAdmin** : `http://localhost:8081`
+- **API** : `http://localhost:9083`
+- **phpMyAdmin** : `http://localhost:8083`
 
 ### Vérification santé
 
 ```bash
-curl http://localhost:9081/
+curl http://localhost:9083/
 ```
 
 Réponse attendue :
@@ -499,7 +499,7 @@ Réponse attendue :
 #### 1. Créer un compte
 
 ```bash
-curl -X POST http://localhost:9081/auth/register \
+curl -X POST http://localhost:9083/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "exemple@gmail.com",
@@ -510,7 +510,7 @@ curl -X POST http://localhost:9081/auth/register \
 #### 2. Se connecter (obtenir JWT)
 
 ```bash
-curl -X POST http://localhost:9081/auth/login \
+curl -X POST http://localhost:9083/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "exemple@gmail.com",
@@ -533,7 +533,7 @@ Réponse :
 #### 3. Créer un dossier
 
 ```bash
-curl -X POST http://localhost:9081/folders \
+curl -X POST http://localhost:9083/folders \
   -H "Authorization: Bearer VOTRE_TOKEN_JWT" \
   -H "Content-Type: application/json" \
   -d '{
@@ -545,7 +545,7 @@ curl -X POST http://localhost:9081/folders \
 #### 4. Uploader un fichier (chiffré automatiquement)
 
 ```bash
-curl -X POST http://localhost:9081/files \
+curl -X POST http://localhost:9083/files \
   -H "Authorization: Bearer VOTRE_TOKEN_JWT" \
   -F "file=@/chemin/vers/document.pdf" \
   -F "folder_id=1"
@@ -554,7 +554,7 @@ curl -X POST http://localhost:9081/files \
 #### 5. Créer un partage
 
 ```bash
-curl -X POST http://localhost:9081/shares \
+curl -X POST http://localhost:9083/shares \
   -H "Authorization: Bearer VOTRE_TOKEN_JWT" \
   -H "Content-Type: application/json" \
   -d '{
@@ -571,7 +571,7 @@ Réponse :
 {
   "id": 42,
   "token": "abc123def456ghi789jkl012mno345pqr678stu901vwx234",
-  "url": "http://localhost:9081/s/abc123def456ghi789jkl012mno345pqr678stu901vwx234",
+  "url": "http://localhost:9083/s/abc123def456ghi789jkl012mno345pqr678stu901vwx234",
   "expires_at": "2026-02-18T23:59:59Z",
   "max_uses": 5,
   "remaining_uses": 5
@@ -581,7 +581,7 @@ Réponse :
 #### 6. Télécharger via lien public (sans authentification)
 
 ```bash
-curl -X POST http://localhost:9081/s/abc123def456.../download -O -J
+curl -X POST http://localhost:9083/s/abc123def456.../download -O -J
 ```
 
 ---
@@ -940,7 +940,7 @@ tests/coffre-fort-numerique-projet.postman_collection_V2.json
 **Variables d'environnement** :
 ```json
 {
-  "base_url": "http://localhost:9081",
+  "base_url": "http://localhost:9083",
   "token": "",
   "user_id": "",
   "file_id": "",
@@ -1022,8 +1022,8 @@ docker ps
 
 #### Services disponibles
 
-- **API Backend** : `http://localhost:9081`
-- **phpMyAdmin** : `http://localhost:8081`
+- **API Backend** : `http://localhost:9083`
+- **phpMyAdmin** : `http://localhost:8083`
 - **MySQL** : `localhost:3306` (accessible depuis l'hôte)
 
 #### Arrêt et nettoyage

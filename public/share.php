@@ -15,7 +15,7 @@
 
     <body>
         <header>
-            <nav class="navbar">                
+            <nav class="navbar">                 
                 <!-- Icon -->
                 <div class="logo">
                     <img id="img-logo" src="img/logo.jpeg" alt="Logo"></img>

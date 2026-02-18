@@ -15,12 +15,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/",
+          "raw": "http://localhost:9083/",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             ""
           ]
@@ -44,12 +44,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/files",
+          "raw": "http://localhost:9083/files",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "files"
           ]
@@ -90,12 +90,12 @@
           ]
         },
         "url": {
-          "raw": "http://localhost:9081/files",
+          "raw": "http://localhost:9083/files",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "files"
           ]
@@ -119,12 +119,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/files?folder=3",
+          "raw": "http://localhost:9083/files?folder=3",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "files"
           ],
@@ -154,12 +154,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/files/19",
+          "raw": "http://localhost:9083/files/19",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "files",
             "19"
@@ -193,12 +193,12 @@
           }
         },
         "url": {
-          "raw": "http://localhost:9081/files/48",
+          "raw": "http://localhost:9083/files/48",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "files",
             "48"
@@ -223,12 +223,12 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/files/24",
+          "raw": "http://localhost:9083/files/24",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "files",
             "24"
@@ -253,12 +253,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/files/3/versions?limit=1",
+          "raw": "http://localhost:9083/files/3/versions?limit=1",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "files",
             "3",
@@ -326,12 +326,12 @@
           ]
         },
         "url": {
-          "raw": "http://localhost:9081/files/48/versions",
+          "raw": "http://localhost:9083/files/48/versions",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "files",
             "48",
@@ -357,12 +357,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/files/46/versions/3/download",
+          "raw": "http://localhost:9083/files/46/versions/3/download",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "files",
             "46",
@@ -390,12 +390,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/files/19/download",
+          "raw": "http://localhost:9083/files/19/download",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "files",
             "19",
@@ -425,12 +425,12 @@
           "raw": "{\r\n    \"email\": \"klaudia@gmail.com \",\r\n    \"password\": \"klaudia123\"\r\n}"
         },
         "url": {
-          "raw": "http://localhost:9081/files/3/versions/1",
+          "raw": "http://localhost:9083/files/3/versions/1",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "files",
             "3",
@@ -457,12 +457,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/folders",
+          "raw": "http://localhost:9083/folders",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "folders"
           ]
@@ -495,12 +495,12 @@
           }
         },
         "url": {
-          "raw": "http://localhost:9081/folders",
+          "raw": "http://localhost:9083/folders",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "folders"
           ]
@@ -533,12 +533,12 @@
           }
         },
         "url": {
-          "raw": "http://localhost:9081/folders/4",
+          "raw": "http://localhost:9083/folders/4",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "folders",
             "4"
@@ -563,12 +563,12 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/folders/4",
+          "raw": "http://localhost:9083/folders/4",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "folders",
             "4"
@@ -593,12 +593,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/users",
+          "raw": "http://localhost:9083/users",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "users"
           ]
@@ -622,12 +622,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/users/2",
+          "raw": "http://localhost:9083/users/2",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "users",
             "2"
@@ -651,12 +651,12 @@
           }
         },
         "url": {
-          "raw": "http://localhost:9081/auth/register",
+          "raw": "http://localhost:9083/auth/register",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "auth",
             "register"
@@ -680,12 +680,12 @@
           }
         },
         "url": {
-          "raw": "http://localhost:9081/users",
+          "raw": "http://localhost:9083/users",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "users"
           ]
@@ -724,12 +724,12 @@
           }
         },
         "url": {
-          "raw": "http://localhost:9081/auth/login",
+          "raw": "http://localhost:9083/auth/login",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "auth",
             "login"
@@ -754,12 +754,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/admin/users/quotas",
+          "raw": "http://localhost:9083/admin/users/quotas",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "admin",
             "users",
@@ -794,12 +794,12 @@
           }
         },
         "url": {
-          "raw": "http://localhost:9081/admin/users/5/quota",
+          "raw": "http://localhost:9083/admin/users/5/quota",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "admin",
             "users",
@@ -826,12 +826,12 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/admin/users/4",
+          "raw": "http://localhost:9083/admin/users/4",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "admin",
             "users",
@@ -878,12 +878,12 @@
           }
         },
         "url": {
-          "raw": "http://localhost:9081//shares",
+          "raw": "http://localhost:9083//shares",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "",
             "shares"
@@ -901,12 +901,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/s/7IuvXotxtVi_4dDs6iggjLpQv3kTFA897JLsTe9PDoc",
+          "raw": "http://localhost:9083/s/7IuvXotxtVi_4dDs6iggjLpQv3kTFA897JLsTe9PDoc",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "s",
             "7IuvXotxtVi_4dDs6iggjLpQv3kTFA897JLsTe9PDoc"
@@ -924,12 +924,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/s/JSSbMvJVpPZMRqVP7AW21GwNjzrQFNzKQehKvjHDKGI",
+          "raw": "http://localhost:9083/s/JSSbMvJVpPZMRqVP7AW21GwNjzrQFNzKQehKvjHDKGI",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "s",
             "JSSbMvJVpPZMRqVP7AW21GwNjzrQFNzKQehKvjHDKGI"
@@ -947,12 +947,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/s/Ww5uCBQViskDSXnZ7XMCaKLdGLiXEJUJg1Ej_BOyrpU/versions",
+          "raw": "http://localhost:9083/s/Ww5uCBQViskDSXnZ7XMCaKLdGLiXEJUJg1Ej_BOyrpU/versions",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "s",
             "Ww5uCBQViskDSXnZ7XMCaKLdGLiXEJUJg1Ej_BOyrpU",
@@ -971,12 +971,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/s/e0g3k1OdpbGlgKand4V7nP8PVHeBCYvBX8MSzYOdo4g/download",
+          "raw": "http://localhost:9083/s/e0g3k1OdpbGlgKand4V7nP8PVHeBCYvBX8MSzYOdo4g/download",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "s",
             "e0g3k1OdpbGlgKand4V7nP8PVHeBCYvBX8MSzYOdo4g",
@@ -995,12 +995,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/s/JSSbMvJVpPZMRqVP7AW21GwNjzrQFNzKQehKvjHDKGI/download",
+          "raw": "http://localhost:9083/s/JSSbMvJVpPZMRqVP7AW21GwNjzrQFNzKQehKvjHDKGI/download",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "s",
             "JSSbMvJVpPZMRqVP7AW21GwNjzrQFNzKQehKvjHDKGI",
@@ -1026,12 +1026,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/shares",
+          "raw": "http://localhost:9083/shares",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "shares"
           ]
@@ -1067,12 +1067,12 @@
           }
         },
         "url": {
-          "raw": "http://localhost:9081/shares/25",
+          "raw": "http://localhost:9083/shares/25",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "shares",
             "25"
@@ -1106,12 +1106,12 @@
           }
         },
         "url": {
-          "raw": "http://localhost:9081/shares/19",
+          "raw": "http://localhost:9083/shares/19",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "shares",
             "19"
@@ -1145,12 +1145,12 @@
           }
         },
         "url": {
-          "raw": "http://localhost:9081/shares/19/revoke",
+          "raw": "http://localhost:9083/shares/19/revoke",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "shares",
             "19",
@@ -1185,12 +1185,12 @@
           }
         },
         "url": {
-          "raw": "http://localhost:9081/quota",
+          "raw": "http://localhost:9083/quota",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "quota"
           ]
@@ -1214,12 +1214,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/me/quota",
+          "raw": "http://localhost:9083/me/quota",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "me",
             "quota"
@@ -1244,12 +1244,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/me/activity",
+          "raw": "http://localhost:9083/me/activity",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "me",
             "activity"
@@ -1274,12 +1274,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:9081/stats",
+          "raw": "http://localhost:9083/stats",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "9081",
+          "port": "9083",
           "path": [
             "stats"
           ]

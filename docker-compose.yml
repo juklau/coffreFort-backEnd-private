@@ -6,9 +6,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: coffreFort-web
+    container_name: coffreFort-web-private
     ports: 
-      - "9081:80"
+      - "9083:80"
     volumes:
 
       # Monter le code source dans le conteneur => à monte précisément ce dont Apache a besoin
@@ -41,7 +41,7 @@ services:
   # Service Base de Données MySQL
   mysql:
     image: mysql:8.0
-    container_name: coffreFort-db
+    container_name: coffreFort-db-private
     # ports: => il ne faut pas car le phpmyadmin communique avec la BDD via le réseau interne de Docker, pas besoin d'exposer le port MySQL à l'extérieur
     #   - "3306:3306" # ok en DEV; à NE PAS exposer en prod
     env_file:
@@ -73,10 +73,10 @@ services:
   # Service phpMyAdmin (développement uniquement)
   phpmyadmin:
     image: phpmyadmin:latest
-    container_name: coffreFort-phpmyadmin
+    container_name: coffreFort-phpmyadmin-private
     restart: unless-stopped
     ports:
-      - "8081:80"
+      - "8083:80"
     env_file:
       - ./.env
     environment:
