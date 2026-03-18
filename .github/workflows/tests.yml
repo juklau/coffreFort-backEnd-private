@@ -1,0 +1,60 @@
+name: Tests PHPUnit
+
+on: # déclenchement du workflow
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:  # démarrage manuel depuis GitHub en ajoutant un bouton 
+
+jobs: # les étapes sont exécuter sur une machine virtuelle
+  tests:
+    name: Tests unitaires (PHP ${{ matrix.php-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version: ['8.2', '8.3', '8.4'] # vérification sur plusieurs versions
+      fail-fast: false  # continue les autres versions si l'une échoue
+
+    steps: # exécuter dans l'ordre
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, json, pdo
+          coverage: none  # mettre 'xdebug' pour générer un rapport de couverture du code
+
+      - name: Vérifier les versions
+        run: |
+          php --version
+          composer --version
+
+      - name: Mettre en cache les dépendances Composer
+      # composer install => download packages et les mets dans vendor/ 
+      # utilisé si composer.lock ne change pas, pas de nouvelle dépendence <=> 
+      # sinon le cache est regénéré
+        uses: actions/cache@v4
+        with:
+          path: vendor/
+          key: composer-${{ matrix.php-version }}-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            composer-${{ matrix.php-version }}-
+
+      - name: Installer les dépendances
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Lancer les tests
+        run: ./vendor/bin/phpunit --no-coverage # pour aller plus vite
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SHARE_SECRET: ${{ secrets.SHARE_SECRET }}
+          KEY_ENCRYPTION_KEY: ${{ secrets.KEY_ENCRYPTION_KEY }}
+          APP_PUBLIC_BASE_URL: ${{ secrets.APP_PUBLIC_BASE_URL }}
