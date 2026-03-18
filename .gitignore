@@ -6,3 +6,5 @@ restore.sh
 storage/uploads/*
 
 !storage/uploads/.gitkeep
+
+phpunit.xml
