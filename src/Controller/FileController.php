@@ -1544,7 +1544,7 @@ class FileController {
         $body = $request->getParsedBody();
         
         // Validation
-        if (!isset($body['user_id']) || !isset($body['name'])) {
+        if (!isset($body['user_id']) || !isset($body['name']) || trim($body['name']) == '') {
             return $this->json($response, ['error' => 'user_id and name are required'], 400);
         }
 

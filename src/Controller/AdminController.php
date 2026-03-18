@@ -121,7 +121,7 @@ class AdminController
 
             if($newQuota < $usedSpace){
                 return $this->json($response, [
-                    'error'             => "Le nouveau quota ne peut pas être infèrieure à l\'espace utilisé.",
+                    'error'             => "Le nouveau quota ne peut pas être inférieure à l'espace utilisé.",
                     'quota_requested'   => $newQuota,
                     'space_used'        => $usedSpace
                 ], 400);
