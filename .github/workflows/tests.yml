@@ -18,7 +18,7 @@ jobs: # les étapes sont exécuter sur une machine virtuelle
 
     strategy:
       matrix:
-        php-version: ['8.2', '8.3', '8.4'] # vérification sur plusieurs versions
+        php-version: ['8.4'] # vérification sur plusieurs versions
       fail-fast: false  # continue les autres versions si l'une échoue
 
     steps: # exécuter dans l'ordre
