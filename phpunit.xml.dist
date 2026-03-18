@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/autoload.php" colors="true">
+    <testsuites>
+        <testsuite name="Unit Tests">
+            <directory>tests/unit</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <env name="JWT_SECRET" value=""/>
+        <env name="SHARE_SECRET" value=""/>
+        <env name="KEY_ENCRYPTION_KEY" value=""/>
+        <env name="APP_PUBLIC_BASE_URL" value=""/>
+    </php>
+</phpunit>
