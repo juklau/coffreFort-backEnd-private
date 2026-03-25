@@ -126,6 +126,7 @@ CREATE TABLE `audit_logs`(
 CREATE INDEX idx_folders_user ON folders(user_id);
 CREATE INDEX idx_files_user_folder ON files(user_id, folder_id);
 CREATE INDEX idx_shares_token ON shares(token);
+CREATE INDEX idx_shares_kind_target ON shares(kind, target_id); -- à vérifier au prochain redémarrage
 CREATE INDEX idx_downloads_share ON downloads_log(share_id);
 CREATE INDEX idx_file_versions_created_at ON file_versions(created_at);
 
