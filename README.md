@@ -21,6 +21,7 @@
 - [API Documentation](#api-documentation)
 - [Sécurité](#sécurité)
 - [Tests](#tests)
+- [Backup & Restauration](#backup--restauration)
 - [Déploiement](#déploiement)
 - [Contribution](#contribution)
 - [Problèmes connus et solutions](#problèmes-connus-et-solutions)
@@ -325,8 +326,9 @@ CREATE TABLE audit_logs (
 ### 1. Cloner le dépôt
 
 ```bash
-git clone https://github.com/PlumCreativ/coffreFort.git
-cd coffreFort
+git clone https://github.com/juklau/coffreFort-backEnd-private.git
+mv coffreFort-backEnd-private coffreFort-backend
+cd coffreFort-backend
 ```
 
 ### 2. Installer les dépendances
@@ -838,6 +840,63 @@ Pour la méthodologie détaillée et la roadmap d'extension des tests, voir [`do
 
 ---
 
+## Backup & Restauration
+
+Le projet inclut deux scripts Bash dans le dossier `backup/` pour sauvegarder et restaurer l'ensemble de l'environnement Docker.
+
+### Ce que sauvegarde `backup.sh`
+
+Chaque archive contient :
+- La base de données MySQL (dump SQL compressé)
+- Les volumes Docker
+- Les fichiers de configuration (`docker-compose.yml`, `.env`, `Dockerfile`, SQL...)
+- Le code applicatif (`public/`, `src/`, `vendor/`, `storage/`...)
+- Les logs Docker des conteneurs `*-private`
+
+Chaque archive est accompagnée d'un fichier `.sha256` — l'intégrité est vérifiée automatiquement après création et avant restauration.
+
+### Lancer un backup manuellement
+
+```bash
+bash backup/backup.sh
+```
+
+### Restaurer un backup
+
+```bash
+# Mode interactif (liste les backups disponibles)
+bash backup/restore.sh
+
+# Fichier spécifique
+bash backup/restore.sh --backup-file backups/cryptovault_backup_20260325_120000.tar.gz
+
+# Mode développement (conserve docker-compose.yml et .env actuels)
+bash backup/restore.sh --dev
+```
+
+### Automatisation avec CRON (WSL)
+
+```bash
+# Installer et démarrer CRON dans WSL
+sudo apt install cron -y && sudo service cron start
+
+# Ajouter la tâche (tous les vendredis à 12h)
+crontab -e
+```
+
+Ligne à ajouter :
+```
+0 12 * * 5 /bin/bash "/chemin/vers/backup/backup.sh" >> "/chemin/vers/backups/cron.log" 2>&1
+```
+
+### Rétention
+
+Les archives de plus de **7 jours** sont supprimées automatiquement. Pour modifier : changer `RETENTION_DAYS` dans `backup.sh`.
+
+> Pour la documentation complète (syntaxe CRON, options de restauration, vérification d'intégrité), voir [`backup/BACKUP_RESTORE.md`](backup/BACKUP_RESTORE.md).
+
+---
+
 ## Déploiement
 
 ### Docker Compose
@@ -979,6 +1038,7 @@ docker exec -it coffreFort-db-private mysql -uroot -proot coffreFort
 - [x] 38 routes testées (Postman + PHPUnit)
 - [x] CASCADE automatique
 - [x] 49 tests unitaires (4 contrôleurs)
+- [x] Backup & restauration automatisés (CRON)
 
 ### Version 2.0 (En cours)
 - [ ] Protection bruteforce (rate limiting)
@@ -999,7 +1059,7 @@ docker exec -it coffreFort-db-private mysql -uroot -proot coffreFort
 
 ## Support
 
-- **Issues GitHub** : [https://github.com/PlumCreativ/coffreFort/issues](https://github.com/PlumCreativ/coffreFort/issues)
+- **Issues GitHub** : [https://github.com/juklau/coffreFort-backEnd-private.git](https://github.com/juklau/coffreFort-backEnd-private.git)
 
 ---
 

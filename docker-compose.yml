@@ -57,8 +57,9 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       # Décommenter pour initialiser la BDD au premier démarrage
-      # NE PAS décommenter pour le backup/restore (les scripts s'exécutent seulement sur volume vide)
-      - ./sql/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+
+      # IL FAUT commenter pour le backup/restore (les scripts s'exécutent seulement sur volume vide)
+      # - ./sql/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
 
       # init_triggers.sql => importer manuellement
       # - ./sql/init_triggers.sql:/docker-entrypoint-initdb.d/02_init_triggers.sql:ro
