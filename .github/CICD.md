@@ -105,7 +105,7 @@ l'architecture du workflow est déjà prête pour l'accueillir.
 .github/
 ├── workflows/
 │   └── tests.yml       ← le workflow CI/CD
-└── README.md           ← ce fichier
+└── CICD.md             ← ce fichier
 
 phpunit.xml             ← ignoré par Git (.gitignore), contient les secrets locaux
 phpunit.xml.dist        ← modèle vide commité, à copier en phpunit.xml en local

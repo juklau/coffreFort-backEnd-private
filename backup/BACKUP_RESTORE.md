@@ -5,9 +5,9 @@
 ```
 coffreFort-back-private/
 ├── backup/
-│   ├── backup.sh           # Script de sauvegarde
-│   ├── restore.sh          # Script de restauration
-│   └── README.md           # Ce fichier
+│   ├── backup.sh                   # Script de sauvegarde
+│   ├── restore.sh                  # Script de restauration
+│   └── BACKUP_RESTORE.md           # Ce fichier
 ├── backups/
 │   ├── cryptovault_backup_20260325_120000.tar.gz
 │   ├── cryptovault_backup_20260325_120000.tar.gz.sha256
