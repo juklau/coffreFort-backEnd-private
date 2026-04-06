@@ -15,3 +15,6 @@ init_triggers_V1.sql
 
 backups
 restores
+
+###> il faut enlever le suivi sur github sinon il écrase le .env de prod###
+docker-compose.yml
