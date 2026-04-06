@@ -38,6 +38,9 @@ class AdminController
     /**
      * GET /admin/users/quotas *********************************************************************************************** OK
      * Liste tous les utilisateurs avec leurs quotas QUE Admin
+     * @param Request $request
+     * @param Response $response
+     * @return Response
      */
     public function listUsersWithQuota(Request $request, Response $response): Response
     {
@@ -52,7 +55,7 @@ class AdminController
         }
 
         try {
-            $allUsers = $this->users->listUsers();
+            $allUsers = $this->users->listUsers(); 
 
             $result = [];
             foreach($allUsers as $user){
@@ -108,7 +111,7 @@ class AdminController
         $newQuota = isset($data['quota']) ? (int)$data['quota'] : null;
 
         if($newQuota == null || $newQuota < 0){
-            return $this->json($response, ['error' => 'Quota invalide (doit être >=0)'], 400);
+            return $this->json($response, ['error' => 'Quota invalide (doit être >= 0)'], 400);
         }
 
         try{
@@ -117,6 +120,7 @@ class AdminController
                 return $this->json($response, ['error' => 'Utilisateur introuvable'], 404);
             }
 
+            //retourne le totel size des fichiers d'un user
             $usedSpace = $this->files->totalSizeByUser($targetUserId);
 
             if($newQuota < $usedSpace){
@@ -131,9 +135,9 @@ class AdminController
 
             return $this->json($response, [
                 'message'    => "Quota modifié avec succès",
-                'user_id'   => $targetUserId,
-                'new_quota' => $newQuota,
-                'used'      =>$usedSpace
+                'user_id'    => $targetUserId,
+                'new_quota'  => $newQuota,
+                'used'       => $usedSpace
             ], 200);
         }catch(\Exception $e){
             return $this->json($response, [
@@ -166,7 +170,7 @@ class AdminController
             return $this->json($response, ['error' => 'Id utilisateur invalide'], 400); 
         }
 
-         //vérif si user existe
+        //vérif si user existe
         $targetUser = $this->users->find($targetUserId);
         if (!$targetUser) {
             return $this->json($response, ['error' => 'Utilisateur introuvable'], 404);
@@ -237,9 +241,9 @@ class AdminController
 
             //retourner un résummé
             $summary = [
-                'message' => "Utilisateur supprimé avec succès (BDD)",
-                'user_id' => $targetUserId,
-                'email' => $targetUser['email'],
+                'message'       => "Utilisateur supprimé avec succès (BDD)",
+                'user_id'       => $targetUserId,
+                'email'         => $targetUser['email'],
                 'deleted_files' => $deletedFiles
             ];
 
@@ -266,7 +270,16 @@ class AdminController
 
      /******************* Functions PRIVATE ***************************************************/
 
+     /**
+      * créer une réponse JSON standardisée
+       * @param Response $response
+       * @param array $data
+       * @param int $status
+       * @return Response
+      */
     private function json(Response $response, array $data, int $status): Response{
+
+        //['error' => 'Not found'] en JSON {"error":"Not found"}
         $response->getBody()->write(json_encode($data, JSON_PRETTY_PRINT));
         return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
     }

@@ -918,6 +918,7 @@ docker ps
 | Service | URL | Description |
 |---|---|---|
 | API Backend | `http://localhost:9083` | API REST Slim |
+| API Backend | `https://cryptovault.iris.a3n.fr:4433/` | API REST Slim |
 | WebDB | `http://localhost:22071` | Interface d'administration BDD |
 | MySQL | `localhost:3306` | Accessible depuis l'hôte |
 

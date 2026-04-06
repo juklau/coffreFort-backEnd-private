@@ -12,9 +12,10 @@ class RequestHelper
     public static function getClientIp(Request $request): string
     {
 
+        // récuperer les paramètres serveur (headers HTTP, infos réseau, IP, etc.)
         $serverParams = $request->getServerParams();
 
-        // Vérifier les headers de proxy courants
+        // liste des headers à vérifier pour trouver l'IP réelle du client, dans l'ordre de confiance
         $headers = [
             'HTTP_X_FORWARDED_FOR', //=> standard proxy/load balancer
             'HTTP_X_REAL_IP',       //=> Nginx
@@ -27,6 +28,8 @@ class RequestHelper
 
                 // X-Forwarded-For peut contenir plusieurs IPs séparées par des virgules
                 $ips = explode(',', $serverParams[$header]);
+
+                //pour prendre le premier IP de la liste, après nettoyage des espaces
                 $ip = trim($ips[0]);
                 
                 if (filter_var($ip, FILTER_VALIDATE_IP)) {
@@ -38,7 +41,7 @@ class RequestHelper
     }
 
     /**
-     * Récupère le User-Agent du client
+     * Récupère le User-Agent du client p.ex.: Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0
      */
     public static function getUserAgent(Request $request): string
     {

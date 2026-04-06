@@ -449,31 +449,43 @@ if (!isset($body['name']) || trim($body['name']) === '') {
 
 ## CI/CD
 
-L'intégration CI/CD (GitHub Actions) n'est pas encore configurée.
-
-Quand elle sera mise en place, créer `.github/workflows/tests.yml` :
+Le workflow GitHub Actions est configuré dans `.github/workflows/tests.yml`.
+Il se déclenche sur chaque push et pull request vers `main` et `develop`,
+et peut aussi être lancé manuellement depuis l'interface GitHub.
 
 ```yaml
 name: Tests
 
-on: [push, pull_request]
+on: # déclenchement du workflow
+    push:
+        branches:
+        - main
+        - develop
+    pull_request:
+        branches:
+        - main
+        - develop
+    workflow_dispatch:  # démarrage manuel depuis GitHub en ajoutant un bouton 
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/cache@v4
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-      - run: composer install
-      - run: ./vendor/bin/phpunit
+      - run: composer install --no-interaction --prefer-dist --optimize-autoloader
+      - run: ./vendor/bin/phpunit --no-coverage # pour aller plus vite
     env:
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       SHARE_SECRET: ${{ secrets.SHARE_SECRET }}
+      KEY_ENCRYPTION_KEY: ${{ secrets.KEY_ENCRYPTION_KEY }}
+      APP_PUBLIC_BASE_URL: ${{ secrets.APP_PUBLIC_BASE_URL }}
 ```
 
-Les secrets sont à définir dans **Settings → Secrets → Actions** du dépôt GitHub.
+Les secrets nécessaires (`JWT_SECRET`, `SHARE_SECRET`, `KEY_ENCRYPTION_KEY`, 
+`APP_PUBLIC_BASE_URL`) sont à définir dans **Settings → Secrets → Actions**.
 
 ---
 

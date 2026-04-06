@@ -185,7 +185,7 @@ class FileController {
 
 
     // GET /files/{id}  => détails d'un fichier avec versions  ************************************************************************ OK
-    //(FileDetails=> pour rafraîchir les métadonnées (latest_versions içi n'est pas utilisé)
+    //(FileDetails => pour rafraîchir les métadonnées (latest_versions içi n'est pas utilisé)
     public function show(Request $request, Response $response, array $args): Response
     {
         $id = (int)$args['id'];
@@ -225,14 +225,18 @@ class FileController {
 
         // formatter les versions avec checksum tronqué => BINARY(32) => bin2hex puis truncate  
         $latestMapped = array_map(function ($row) {
+
+            // transforme binaire -> texte hexadécimal
             $checksumHex = bin2hex($row['checksum']);
             return [
                 'version'       => (int)$row['version'],
                 'size'          => (int)$row['size'],
                 'created_at'    => $row['created_at'],
-                'checksum'      => substr($checksumHex, 0, 12) . '...'  // 12 premiers caractères
+
+                // 12 premiers caractères pour éviter envoyer 64 caractères
+                'checksum'      => substr($checksumHex, 0, 12) . '...'  
             ];
-        }, $latestVersions);
+        }, $latestVersions); //entrée => $latestVersions
 
         // Construction la réponse
         $responseData = [
@@ -352,7 +356,7 @@ class FileController {
         $uploadedFiles = $request->getUploadedFiles();
         if(empty($uploadedFiles) || !isset($uploadedFiles['file'])){
              return $this->json($response, [
-                'error' => "Aucun fichier fourni",
+                'error'         => "Aucun fichier fourni",
                 'received_keys' => !empty($uploadedFiles) ? array_keys($uploadedFiles) : []
                 ], 400);
         }
@@ -406,6 +410,8 @@ class FileController {
 
         //vérif quota
         $size = (int)$file->getsize();
+
+        //retourne le totel size des fichiers d'un user
         $totalSize = $this->files->totalSizeByUser($userId); //=> par utilisateur!!! 
         $quota = $this->files->userQuotaTotal($userId); //ancien quotaBytes 
 
@@ -456,7 +462,7 @@ class FileController {
             $aadContent = "file:$fileId:v$version";
             $aadKey     = "filekey:$fileId:v$version";
 
-             // Lire le fichier téléversé par stream
+            // Lire le fichier téléversé par stream
             try {
                 $plain = StorageWriter::readBinary($tmpPath);
             } catch (\RuntimeException $e) {
@@ -479,7 +485,7 @@ class FileController {
             //Écriture avec stream 
             StorageWriter::writeBinary($outPath, $crypto['ciphertext']);
 
-           // Libérer la mémoire
+            // Libérer la mémoire
             unset($crypto['ciphertext']);
            
             // créer la version 1
@@ -528,7 +534,7 @@ class FileController {
             }
 
             return $this->json($response, [
-                'error' => 'Erreur lors de l\'upload',
+                'error'   => 'Erreur lors de l\'upload',
                 'details' => $e->getMessage(),
             ], 500);
         }
@@ -584,7 +590,7 @@ class FileController {
 
         if($currentExtension !== $uploadedExtension){
             return $this->json($response, [
-                'error' => 'Le type de fichier ne correspond pas',
+                'error'    => 'Le type de fichier ne correspond pas',
                 'expected' => $currentExtension,
                 'received' => $uploadedExtension
              ], 400);
@@ -595,9 +601,10 @@ class FileController {
         $currentMimeType = $this->files->getMimeType($fileId);
 
         if(!$this->isMimeTypeCompatible($currentMimeType, $uploadedMimeType)){
-            return $this->json($response, ['error' => 'Le type MIME ne correspond pas',
-             'expected' => $currentMimeType,
-             'received' => $uploadedMimeType
+            return $this->json($response, [
+                'error'    => 'Le type MIME ne correspond pas',
+                'expected' => $currentMimeType,
+                'received' => $uploadedMimeType
              ], 400);
         }
 
@@ -613,7 +620,7 @@ class FileController {
         $quota = $this->files->userQuotaTotal($userId);
 
         if($quota > 0 && ($totalSize + $size) > $quota){
-            return $this->json($response, ['error' => 'Quota exceeded'], 413);
+            return $this->json($response, ['error' => 'Quota dépassé'], 413);
         }
 
         //charger le contenu et chiffrer => pour l'instant max. 10Mo
@@ -1033,7 +1040,7 @@ class FileController {
 
         }catch (\Throwable $e){
             $message = $e->getMessage();
-            error_log('Decrypt failed (downloadVersion): ' . $message);
+            error_log('Échec déchiffrement (downloadVersion): ' . $message);
 
             //log de l'échec du déchiffrement
             if(isset($this->downloadLog)){
@@ -1067,7 +1074,16 @@ class FileController {
 
  /***************************************** Functions PRIVATE ***************************************************************/
 
+      /**
+      * créer une réponse JSON standardisée
+       * @param Response $response
+       * @param array $data
+       * @param int $status
+       * @return Response
+      */
     private function json(Response $response, array $data, int $status): Response{
+
+        //['error' => 'Not found'] en JSON {"error":"Not found"}
         $response->getBody()->write(json_encode($data, JSON_PRETTY_PRINT));
         return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
     }
@@ -1122,7 +1138,7 @@ class FileController {
             //transaction SQL
             $this->db->pdo->beginTransaction();
 
-             // Supprimer les versions en BDD
+            // Supprimer les versions en BDD
             $this->files->deleteAllVersions($fileId);
 
             // Supprimer le fichier en BDD
@@ -1131,6 +1147,7 @@ class FileController {
             $this->db->pdo->commit();
 
             //mise à jour le quota
+            //retourne le totel size des fichiers d'un user
             $newTotalSize = $this->files->totalSizeByUser($userId);
             $this->users->updateUserQuotaUsed($userId, $newTotalSize);
 
@@ -1194,7 +1211,7 @@ class FileController {
              return $this->json($response, ['error' => 'Cette version n\'appartient pas à ce fichier'], 403);
         }
 
-        //ne pas supprimer la version courante
+        //ne pas supprimer la version courante ???
         $currentVersion = (int)$file['current_version'];
         if((int)$version['version'] === $currentVersion){
             return $this->json($response, ['error' => 'Impossible de supprimer la version active du fichier'], 400);
@@ -1250,7 +1267,7 @@ class FileController {
 
         $id = (int)($args['id'] ?? 0);
         if($id <= 0){
-            return $this->json($response, ['error' => 'id invalide'], 400);
+            return $this->json($response, ['error' => 'id fichier invalide'], 400);
         }
 
         $file = $this->files->find($id);
@@ -1300,8 +1317,6 @@ class FileController {
     }
 
 
-   
-
 
     // GET /stats
     public function stats(Request $request, Response $response): Response
@@ -1330,7 +1345,8 @@ class FileController {
     }
 
 
-    // PUT /quota - Met à jour le quota d'un utilisateur (PAR USER) =>actuellement je ne l'utilise pas
+    // PUT /quota - Met à jour le quota d'un utilisateur =>actuellement je ne l'utilise pas
+    //j'utilise plutôt PUT /admin/users/{id}/quota dans AdminController pour que l'admin puisse mettre à jour le quota d'un utilisateur
     public function setQuota(Request $request, Response $response): Response
     {
         try {
@@ -1434,7 +1450,7 @@ class FileController {
             return $this->json($response, ['error' => $e->getMessage()], 401);
         }
 
-         // paramètre de pagination
+        // paramètre de pagination
         $queryParams = $request->getQueryParams();
         $limit = isset($queryParams['limit']) ? min(100, max(1, (int)$queryParams['limit'])) : 20; // garantir: 1 < limit < 20
         $offset = isset($queryParams['offset']) ? max(0, (int)$queryParams['offset']) : 0;
@@ -1545,7 +1561,7 @@ class FileController {
         
         // Validation
         if (!isset($body['user_id']) || !isset($body['name']) || trim($body['name']) == '') {
-            return $this->json($response, ['error' => 'user_id and name are required'], 400);
+            return $this->json($response, ['error' => 'user_id et nom sont requis'], 400);
         }
 
         // Si parent_id n'est pas fourni ou est 0 => à mettre NULL pour un dossier racine
@@ -1572,7 +1588,7 @@ class FileController {
     }
 
 
-    // DELETE /folders/{id}  => à mettre dedans  le vérif propriétaire *********************************************************** OK
+    // DELETE /folders/{id}   ******************************************************************* OK
     public function deleteFolder(Request $request, Response $response, array $args): Response
     {
         $folderId = (int)($args['id'] ?? 0);
@@ -1603,7 +1619,7 @@ class FileController {
         $filesInFolder = $this->files->countFilesByFolder($folderId, $userId);
         if ($filesInFolder > 0) {
             return $this->json($response, [
-                'error' => 'Le dossier contient des fichiers et ne peut pas être supprimé',
+                'error'       => 'Le dossier contient des fichiers et ne peut pas être supprimé',
                 'files_count' => $filesInFolder
             ], 400);
         }
@@ -1612,7 +1628,7 @@ class FileController {
         $subfolders = $this->files->countSubfolders($folderId);
         if ($subfolders > 0) {
             return $this->json($response, [
-                'error' => 'Le dossier contient des sous-dossiers et ne peut pas être supprimé',
+                'error'            => 'Le dossier contient des sous-dossiers et ne peut pas être supprimé',
                 'subfolders_count' => $subfolders
             ], 400);
         }
@@ -1625,7 +1641,7 @@ class FileController {
             return $this->json($response, ['message' => 'Folder supprimé avec succès'], 204);
         }catch(\Exception $e){
             return $this->json($response, [
-                'error' => 'Erreur lors de la suppression du dossier',
+                'error'   => 'Erreur lors de la suppression du dossier',
                 'details' => $e->getMessage()
             ], 500);
         }
@@ -1672,7 +1688,7 @@ class FileController {
             return $this->json($response, ['error' => 'Nom invalide (caracteres interdits)'], 400);
         }
 
-        //empêcher le doublon dans le même parent
+        // empêcher le doublon dans le même parent
         $parentId = $folder['parent_id'] !== null ? (int)$folder['parent_id'] : null;
         if($this->files->folderNameExistForUser($userId, $parentId, $newName, $folderId)){
             return $this->json($response, ['error' => 'Un dossier avec ce nom existe deja ici'], 409);
@@ -1689,8 +1705,6 @@ class FileController {
             'name'          => $newName
         ], 200);
     }
-
-
 
 }
 

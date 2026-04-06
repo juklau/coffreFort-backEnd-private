@@ -25,7 +25,7 @@ class AuthService
         $authHeader = $request->getHeaderLine('Authorization');
         if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
             throw new \Exception('Token manquant', 401);
-        }
+        } 
 
         $jwt = substr($authHeader, 7);
 

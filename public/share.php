@@ -63,7 +63,7 @@
                         </span>
                     </div>
 
-                    <!-- sélécteur => quand ça va être autorisé -->
+                    <!-- sélécteur => quand c'est autorisé -->
                     <div id="version-picker-wrap" class="mt-3">
                         <label for="version-picker" class="form-label mb-1">
                             <i class="bi bi-list-ol"></i> Choisir une version à télécharger
@@ -91,7 +91,7 @@
 
                     <!-- expiration et téléchargement restant-->
                     <p class= "py-1"><strong>Expiration :</strong> <span id="expires-left">-</span></p>
-                    <p class= "py-1"><strong> Téléchargement restant : </strong> <br><span id="uses-left">-</span></p>
+                    <p class= "py-1"><strong>Téléchargement restant : </strong> <br><span id="uses-left">-</span></p>
                 </div>
 
                 <div class="file-actions d-flex justify-content-center">

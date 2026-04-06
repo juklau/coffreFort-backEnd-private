@@ -56,6 +56,4 @@ class DownloadLogRepository{
             'LIMIT'          => [$offset, $limit]
         ]);
     }
-
-
 }

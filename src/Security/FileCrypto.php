@@ -44,6 +44,7 @@ final class FileCrypto {
 
     /**
      * Wrap (enveloppe) la fileKey avec la KEK via AES-256-GCM.
+     * pour ne pas stocker la fileKey en clair, on la chiffre avec une KEK (Key Encryption Key) secrète gérée par le serveur.
      * key_envelope = envIv || envTag || wrappedKey
      *
      * @return array{keyEnvelope:string, envIv:string, envTag:string, wrappedKey:string}
@@ -53,13 +54,13 @@ final class FileCrypto {
 
         $kek = self::normalizeKek($kek);
 
-        $envIv = random_bytes(12);
+        $envIv = random_bytes(12);  //on utilise AES-GCM pour envelopper la clé
         $envTag = '';
 
         $wrappedKey = openssl_encrypt(
             $fileKey,
             'aes-256-gcm',
-            $kek,
+            $kek,               //pour chiffrer la fileKey, on utilise la KEK (Key Encryption Key) qui est une clé secrète de chiffrement gérée par le serveur
             OPENSSL_RAW_DATA,
             $envIv,
             $envTag,
@@ -73,7 +74,7 @@ final class FileCrypto {
             throw new \RuntimeException('Key envelope failed (wrappedKey/tag invalid)');
         }
 
-        // key_envelope = envIv || envTag || wrappedKey
+        // key_envelope = envIv(12) || envTag(16) || wrappedKey(n)
         $keyEnvelope = $envIv . $envTag . $wrappedKey;
 
         return [
@@ -88,7 +89,7 @@ final class FileCrypto {
     /**
      * Fonction "tout-en-un" pour upload :
      * - chiffre le plaintext
-     * - wrap la clé
+     * - enveloppe la clé
      * - calcule checksum binaire sha256(ciphertext)
      *
      * @return array{ciphertext:string, iv:string, tag:string, key_envelope:string, checksum:string, size_plain:int}
@@ -101,6 +102,8 @@ final class FileCrypto {
         $wrap = self::wrapFileKey($enc['fileKey'], $kek, $aadKey);
 
         $ciphertext = $enc['ciphertext'];
+
+        //calculer le SHA-256 du contenu chiffré pour vérifier l'intégrité du ciphertext lors du déchiffrement
         $checksum = hash('sha256', $ciphertext, true);
 
         return [
@@ -114,6 +117,7 @@ final class FileCrypto {
     }
 
     /**
+     * vérifier que le KEK serveur est valide et normalisé à 32 bytes pour AES-256, sinon exception.
      * Vérifie/normalise la KEK : >= 32, tronque à 32.
      */
     public static function normalizeKek(string $kek): string
@@ -128,6 +132,7 @@ final class FileCrypto {
             throw new \RuntimeException('Server KEK missing/misconfigured');
         }
 
+        //troncature => garder exactement les 32 premiers caractères (256 bits) pour AES-256
         return substr($kek, 0, 32);
     }
 
@@ -143,9 +148,9 @@ final class FileCrypto {
         }
 
         return [
-            'envIv'         => substr($keyEnvelope, 0, 12),
-            'envTag'        => substr($keyEnvelope, 12, 16),
-            'wrappedKey'    => substr($keyEnvelope, 28),
+            'envIv'         => substr($keyEnvelope, 0, 12),   //bytes 0-11
+            'envTag'        => substr($keyEnvelope, 12, 16),  //bytes 12-27
+            'wrappedKey'    => substr($keyEnvelope, 28),      //bytes 28-fin
         ];
     }
 
@@ -219,7 +224,7 @@ final class FileCrypto {
 
     /**
      * JOUR 2 => Déchiffrement côté serveur pour simplicité
-     * Déchiffrement "tout-en-un" à partir de la ligne file_versions.
+     * Déchiffrement "tout-en-un" à partir de la ligne file_versions pour lire une version de fichier stockée
      * - calcule AAD (clé + contenu) sur (fileId, version)
      * - unwrap fileKey depuis key_envelope
      * - decrypt ciphertext
@@ -230,7 +235,7 @@ final class FileCrypto {
     public static function decryptFromStorage(string $ciphertext, array $versionRow, string $kek, int $fileId): array
     {
 
-        $servedVersion = (int)($versionRow['version'] ?? 0); // important
+        $servedVersion = (int)($versionRow['version'] ?? 0); // important, car elle sert pour calculer l'AAD et doit être un entier valide > 0
         if($servedVersion <= 0){
             throw new \RuntimeException('Version invalide (absente ou <= 0)');
         }
@@ -247,12 +252,15 @@ final class FileCrypto {
             throw new \RuntimeException('IV/auth_tag manquant(s)');
         }
 
-         // AAD stable et déterministe => doit être IDENTIQUE entre encrypt/decrypt!!!!!
+        // AAD stable et déterministe => doit être IDENTIQUE entre encrypt/decrypt!!!!!
+        // on inclut la version servie dans l'AAD pour garantir que le même ciphertext ne puisse pas être servi pour une autre version (replay attack)
         $aadKey = "filekey:$fileId:v$servedVersion";
         $aadContent = "file:$fileId:v$servedVersion";
 
+        //récuperer envIv et envTag et wrappedKey depuis key_envelope
         $parts = self::parseKeyEnvelope($keyEnvelope);
 
+        //déchiffrer la fileKey avec la KEK et les parties de l'enveloppe
         $fileKey = self::unwrapFileKey(
             $parts['wrappedKey'],
             $kek,
@@ -261,6 +269,7 @@ final class FileCrypto {
             $aadKey
         );
 
+        //déchiffrer le contenu avec la fileKey, iv, tag, aadContent
         $plaintext = self::decryptContent($ciphertext, $fileKey, $iv, $tag, $aadContent);
 
         // Vérifier le checksum
@@ -273,7 +282,7 @@ final class FileCrypto {
         }
 
         return [
-            'plaintext' => $plaintext,
+            'plaintext'     => $plaintext,
             'servedVersion' => $servedVersion,
         ];
     }

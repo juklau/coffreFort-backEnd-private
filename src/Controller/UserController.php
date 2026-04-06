@@ -124,7 +124,8 @@ class UserController
             'iss'       => 'coffre-fort',          // émetteur
             'aud'       => 'coffre-fort-users',    // audience
             'iat'       => time(),                 // date d’émission
-            'exp'       => time() + 3600,          // expiration (1h)
+            'exp'       => time() + 900,          // expiration (15min)
+            // 'exp'       => time() + 3600,          // expiration (1h)
             //'exp'       => time() + 300,          // expiration (5min pour tests)
             'user_id'   => $user['id'],            // identifiant utilisateur
             'email'     => $user['email'],
@@ -192,18 +193,26 @@ class UserController
 
 
     // ROUTE DASHBOARD (protégée)
+    /**
+     * vérifie que user est authentifié via un JWT valide (dans Header ou GET)
+     */
     public function dashboard(Request $request, Response $response)
     {
         // Essayer de récupérer via Header
+        // Authorization: Bearer eyJhbGciOiJIUzI1Ni...
         $authHeader = $request->getHeaderLine('Authorization');
         $jwt = null;
 
         if (preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
+
+            // $matches[1] contient le token après "Bearer "
             $jwt = $matches[1];
         }
 
         // Si pas trouvé → essayer GET
         if (!$jwt) {
+
+            //dashboard?jwt=abc123
             $params = $request->getQueryParams();
             $jwt = $params['jwt'] ?? null;
         }
@@ -215,6 +224,9 @@ class UserController
 
         // Décodage JWT
         try {
+
+            // decode va vérifier la signature et l'expiration et décode le token
+            // HS256 => algorithme de signature HMAC SHA‑256 (symétrique, même secret pour signer et vérifier)
             $jwt = JWT::decode($jwt, new Key($this->jwtSecret, 'HS256'));
         } catch (\Exception $e) {
             return $response->withStatus(403);

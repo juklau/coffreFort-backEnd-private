@@ -22,7 +22,7 @@ function humanSize(bytes) {
 function daysLeft(expiresAt){
     if(!expiresAt) return null;
 
-    // "2025-12-26T09:39:54Z" => interprétation 26 décembre à 09:39:54 UTC.
+    // interprétation 26 décembre à 09:39:54 UTC => en "2025-12-26T09:39:54Z"
     const exp = new Date(expiresAt.replace(" ", "T") + "Z");
 
     const now = new Date();
@@ -46,15 +46,15 @@ function setText(sel, value) {
 }
 
 function hide(sel) {
-    const el = document.querySelector(sel);
-    if (!el) return;
-    el.style.display = "none";
+    const element = document.querySelector(sel);
+    if (!element) return;
+    element.style.display = "none";
 }
 
 function show(sel) {
-    const el = document.querySelector(sel);
-    if (!el) return;
-    el.style.display = "";
+    const element = document.querySelector(sel);
+    if (!element) return;
+    element.style.display = "";
 }
 
 function getToken() {
@@ -89,6 +89,7 @@ function loadVersions(token){
 
     const versionsUrl = `/s/${encodeURIComponent(token)}/versions?limit=50&offset=0`;
 
+    //appel API pour récupérer la liste des versions du fichier partagé
     fetch(versionsUrl)
         .then(async resp => {
             const data = await resp.json().catch(() => ({}));
@@ -97,6 +98,7 @@ function loadVersions(token){
             } 
             return data;
         })
+        //traiter les données reçues pour afficher les versions dans le sélecteur
         .then((vdata) => {
 
             //peupler le select min version courante only => plus tard via endpoint???
@@ -116,8 +118,8 @@ function loadVersions(token){
             const versions = vdata.versions || [];
             versions.forEach(v => {
                 const option = document.createElement("option");
-                option.value = String(v.version);
-                option.textContent = `v${v.version} - ${formatDateTime(v.created_at)} (${humanSize(v.size)})`;
+                option.value = String(v.version); //p.ex. "3" => ?v=3
+                option.textContent = `v${v.version} - ${formatDateTime(v.created_at)} (${humanSize(v.size)})`; //v3 - 26/12/2025 (2.4 MB)
 
                 //marquer la version courante
                 if(v.is_current) {
@@ -126,12 +128,12 @@ function loadVersions(token){
                 select.appendChild(option); 
             });
 
-            // pour éviter d'emplier en cas de rechargement
+            // pour éviter d'emplier en cas de rechargement => déclencher quand user choisit une version
             select.onchange = () => {
-                updateDownloadLink(token, select.value);
+                updateDownloadLink(token, select.value); // mettre à jour le lien de téléchargement avec la version sélectionnée
                 
                 // const v = select.value;
-                //autorisation sur ?v= sur download => future
+                // autorisation sur ?v= sur download => future
                 // const dl = document.querySelector("#dl-link");
                 // const base = `/s/${encodeURIComponent(token)}/download`;
                 // dl.href = v ? `${base}?v=${encodeURIComponent(v)}` : base;
@@ -153,7 +155,7 @@ function updateDownloadLink(token, version){
     if(!downloadBtn) return;
     
     const baseUrl = `/s/${encodeURIComponent(token)}/download`;
-    const downloadUrl = version ? `${baseUrl}?v=${encodeURIComponent(version)}` : baseUrl;
+    const downloadUrl = version ? `${baseUrl}?v=${encodeURIComponent(version)}` : baseUrl; // si version est vide => version courante => pas de ?v=
 
     // Mettre à jour le href et attribut data
     downloadBtn.href = downloadUrl;
@@ -189,10 +191,13 @@ fetch(metaurl)
         return data;
     })
 
+    //réponse de API => share => contient les métadonnées du partage (type, nom, taille, date, expiration, etc.) et aussi les métadonnées spécifiques au fichier (original_name, size, created_at, versions_count, current_version, etc.)
     .then(share => {
         console.log("Métadonnées reçues:", share);
 
         const kind = share.kind; // 'file' ou 'folder' <=> si je mets share.kind || 'file' => ça va forcer le type fichier même pour les dossiers => pas bon
+        
+        // fallback si meta absente => pour éviter les erreurs d'accès aux propriétés
         const metaData = share.meta || {};
        
         let displayName;
@@ -204,9 +209,10 @@ fetch(metaurl)
             fileSize = metaData.size;
             createdAt = metaData.created_at;
 
-             //gestion des versions
+            //gestion des versions
             const versionsCount = metaData.versions_count ?? 0;
             const currentVersion = metaData.current_version || null;
+
             //sélecteur si exposition publique va être autorisée => actuellement .......????????
             const allowFixedVersions = share.allow_fixed_versions === true;
 
@@ -251,135 +257,135 @@ fetch(metaurl)
         showError(err.message || "Impossible de charger les informations du partage.");
     });
 
-    //gestion les versions d'un fichier partagé (uniquement pour les partages de type fichier)
-    function handleFileVersions(versionsCount, currentVersion, allowFixedVersions, token){
+//gestion de l'affichage des versions d'un fichier partagé (uniquement pour les partages de type fichier)
+function handleFileVersions(versionsCount, currentVersion, allowFixedVersions, token){
 
-        hide("#versions-box");
-        hide("#version-picker-wrap");
-        hide("#versions-info-only");
+    hide("#versions-box");
+    hide("#version-picker-wrap");
+    hide("#versions-info-only");
 
-        //s'il y a plusieurs versions
-        if(versionsCount > 1) {
+    //s'il y a plusieurs versions
+    if(versionsCount > 1) {
 
-            //affichage le box avec le nbre de versions
-            show("#versions-box");
-            setText("#version-count", versionsCount);
+        //affichage le box avec le nbre de versions
+        show("#versions-box");
+        setText("#version-count", versionsCount);
 
-            if(currentVersion && currentVersion.created_at){
-                setText("#current-version-date", formatDateTime(currentVersion.created_at));
-            }else{
-                setText("#current-version-date", "-");
-            }
-
-            // si les versions fixew sont autorisées
-            if(allowFixedVersions){
-                show("#version-picker-wrap");
-                hide("#versions-info-only");
-
-                // charger la liste des versions
-                loadVersions(token);
-            } else{
-                hide("#version-picker-wrap");
-                show("#versions-info-only");
-            }
-        }
-    }
-
-    //affichage du contenu du dossier partagé
-    function displayFolderContents(files){
-       
-        //section pour afficher la liste des fichiers d'un dossier partagé => à faire!!
-        const filesList = document.querySelector("#folder-files-list");
-        if(!filesList) return;
-
-        if(files.length === 0){
-            filesList.innerHTML = "<p>Dossier vide</p>";
-            return;
-        }
-
-        filesList.innerHTML = files.map(file => `
-            <div class="file-item">
-                <p>
-                    <span class="file-name"><strong>${file.name}</strong></span>
-                    <span class="file-size fst-italic">${humanSize(file.size)}</span>
-                    <span class="file-date fst-italic">${formatDateTime(file.created_at)}</span>
-                </p>
-            </div>
-        `).join("");
-        
-        show("#folder-files-list");
-    }
-
-    //gestion de l'expiration d'un partage
-    function handleExpiration(expiresAt){
-
-        //expiration
-        const left = daysLeft(expiresAt);
-        if(left != null){
-            const txt = left <= 0 ? "Expiré" : `Expire dans ${left} jour(s)`;
-            setText("#expires-left", txt);
-
-            const expiresEl = document.querySelector("#expires-left");
-
-            if(expiresEl){
-                if(left <= 1){
-                    expiresEl.style.color = "red";
-                    expiresEl.style.fontWeight = "bold";
-                }else if(left <= 3){
-                    expiresEl.style.color = "orange";
-                    expiresEl.style.fontWeight = "bold";
-                }
-            }
+        if(currentVersion && currentVersion.created_at){
+            setText("#current-version-date", formatDateTime(currentVersion.created_at));
         }else{
-            setText("#expires-left", "Jamais");
+            setText("#current-version-date", "-");
+        }
+
+        // si les versions fixed sont autorisées
+        if(allowFixedVersions){
+            show("#version-picker-wrap");
+            hide("#versions-info-only");
+
+            // charger la liste des versions
+            loadVersions(token);
+        } else{
+            hide("#version-picker-wrap");
+            show("#versions-info-only");
         }
     }
+}
 
-    //gestion des téléchargements restants
-    function handleRemainingUses(maxUses, remainingUses){
-       
-        if(maxUses !== null && remainingUses !== null) {
-            const remaining = parseInt(remainingUses);
-            const max = parseInt(maxUses);
+//affichage du contenu du dossier partagé
+function displayFolderContents(files){
+    
+    //section pour afficher la liste des fichiers d'un dossier partagé
+    const filesList = document.querySelector("#folder-files-list");
+    if(!filesList) return;
 
-            let usesText;
-            if(remaining <= 0){
-                usesText = "Aucun téléchargement restant";
-            } else if (remaining === 1){
-                usesText = "1 téléchargement restant";
-            }else{
-                usesText = `${remaining} / ${max} téléchargement(s) restant(s)`;
+    if(files.length === 0){
+        filesList.innerHTML = "<p>Dossier vide</p>";
+        return;
+    }
+
+    filesList.innerHTML = files.map(file => `
+        <div class="file-item">
+            <p>
+                <span class="file-name"><strong>${file.name}</strong></span>
+                <span class="file-size fst-italic">${humanSize(file.size)}</span>
+                <span class="file-date fst-italic">${formatDateTime(file.created_at)}</span>
+            </p>
+        </div>
+    `).join("");
+    
+    show("#folder-files-list");
+}
+
+//gestion de l'expiration d'un partage
+function handleExpiration(expiresAt){
+
+    //expiration
+    const left = daysLeft(expiresAt);
+    if(left != null){
+        const txt = left <= 0 ? "Expiré" : `Expire dans ${left} jour(s)`;
+        setText("#expires-left", txt);
+
+        const expiresEl = document.querySelector("#expires-left");
+
+        if(expiresEl){
+            if(left <= 1){
+                expiresEl.style.color = "red";
+                expiresEl.style.fontWeight = "bold";
+            }else if(left <= 3){
+                expiresEl.style.color = "orange";
+                expiresEl.style.fontWeight = "bold";
             }
-            setText("#uses-left", usesText);
-            const usesEl = document.querySelector("#uses-left");
+        }
+    }else{
+        setText("#expires-left", "Jamais");
+    }
+}
 
-            //changer la couleur
-            if(usesEl){
-                if(remaining <= 1){
-                    usesEl.style.color = "red";
-                    usesEl.style.fontWeight = "bold";
-                }else if( remaining <= 3){
-                    usesEl.style.color = "orange";
-                    usesEl.style.fontWeight = "bold";
-                }
-            }
+//gestion des téléchargements restants
+function handleRemainingUses(maxUses, remainingUses){
+    
+    if(maxUses !== null && remainingUses !== null) {
+        const remaining = parseInt(remainingUses);
+        const max = parseInt(maxUses);
+
+        let usesText;
+        if(remaining <= 0){
+            usesText = "Aucun téléchargement restant";
+        } else if (remaining === 1){
+            usesText = "1 téléchargement restant";
         }else{
-            setText("#uses-left","Illimité");
+            usesText = `${remaining} / ${max} téléchargement(s) restant(s)`;
         }
+        setText("#uses-left", usesText);
+        const usesEl = document.querySelector("#uses-left");
+
+        //changer la couleur
+        if(usesEl){
+            if(remaining <= 1){
+                usesEl.style.color = "red";
+                usesEl.style.fontWeight = "bold";
+            }else if( remaining <= 3){
+                usesEl.style.color = "orange";
+                usesEl.style.fontWeight = "bold";
+            }
+        }
+    }else{
+        setText("#uses-left","Illimité");
     }
+}
 
 
-    //config du lien de téléchargement
-    function setupDownloadLink(token){
-       
-        const downloadBtn = document.querySelector("#dl-link");
-        if (downloadBtn) {
-            const downloadUrl = `/s/${encodeURIComponent(token)}/download`;
-            downloadBtn.href = downloadUrl;
-            downloadBtn.setAttribute("data-download-url", downloadUrl);
-            show("#dl-link");
-        }
+//config du lien de téléchargement
+function setupDownloadLink(token){
+    
+    const downloadBtn = document.querySelector("#dl-link");
+    if (downloadBtn) {
+        const downloadUrl = `/s/${encodeURIComponent(token)}/download`;
+        downloadBtn.href = downloadUrl;
+        downloadBtn.setAttribute("data-download-url", downloadUrl);
+        show("#dl-link");
     }
+}
 
 
 
@@ -407,7 +413,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 //pour le redirection ou proxies au cas ou
                 redirect : "follow", 
-                cache: "no-store"
+                cache: "no-store"  // évite cache navigateur pour les téléchargements successifs du même fichier (p.ex. après expiration ou si max_uses = 1) => sinon le navigateur peut servir le fichier depuis son cache sans faire une nouvelle requête au serveur => ça peut faire croire que le téléchargement a réussi alors que le partage est expiré ou plus de téléchargement restant
             });
 
             // si erreur HTTP  => lire json erreur ou texte
@@ -432,7 +438,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if(contentType.includes("application/json") || contentType.includes("text/html")){
 
-                const txt = await response.text().catch(() => "");
+                const txt = await response.text().catch(() => "");  // si .text() plante → txt vaut "" (chaîne vide)
                 throw new Error(
                     "Le serveur n'a pas renvoyé le fichier (réponse: " +
                     (txt ? txt.slice(0, 160) : contentType) +
@@ -457,32 +463,34 @@ document.addEventListener("DOMContentLoaded", () => {
             const contentDisposition  = response.headers.get("Content-Disposition") || "";  //p.ex. attachment, MonFichier.pdf
 
             // capture de filename* = UTF-8'' => jusqu'au ;
+            // filename*=UTF-8''Mon%20Fichier.pdf => Mon%20Fichier.pdf => decodeURIComponent => Mon Fichier.pdf
             const mStar = /filename\*\s*=\s*UTF-8''([^;]+)/i.exec(contentDisposition); 
 
             //chercher la variante filename=.. avec ou sans guillements
+            // filename="MonFichier.pdf" ou filename=MonFichier.pdf
             const m = /filename\s*=\s*"([^"]+)"/i.exec(contentDisposition) || 
                         /filename\s*=\s*([^;]+)/i.exec(contentDisposition);
             
             if(mStar && mStar[1]){ // filename="Poupee.pdf"
                 filename = decodeURIComponent(mStar[1]);  //Poupee.pdf
             }else if (m && m[1]){
-                filename = m[1].trim().replace(/^"(.*)"$/, "$1");
+                filename = m[1].trim().replace(/^"(.*)"$/, "$1"); //enlève les guillemets éventuels => MonFichier.pdf
             }
 
             //créer un lien temporaire pour déclencher le téléchargement
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
+            const url = window.URL.createObjectURL(blob);    // crée une URL temporaire vers le Blob en mémoire
+            const a = document.createElement("a");           // crée un <a> invisible
             a.href = url;
-            a.download = filename;
+            a.download = filename;                           // force le téléchargement avec ce nom
 
             document.body.appendChild(a);
-            a.click();
-            a.remove();
+            a.click();                                       // simule un clic pour déclencher le téléchargement
+            a.remove();                                      // supprime le <a> du DOM
             //window.URL.revokeObjectURL(url);
 
-            //libérer l'url après un délai
+            // libérer l'url après un délai
             // pour éviter le revoke trop vite (sinon certains navigateurs tronquent) ????
-            setTimeout(() => window.URL.revokeObjectURL(url), 2000);
+            setTimeout(() => window.URL.revokeObjectURL(url), 2000);    // libère la mémoire après 2s
 
         }catch(err){
             const msg = (err && err.message) ? err.message : "Erreur inconnue";

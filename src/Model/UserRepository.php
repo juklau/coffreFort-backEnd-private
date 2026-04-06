@@ -62,7 +62,7 @@ class UserRepository
         return $count > 0;
     }
 
-    //update le quota d'un user
+    //update le quota utilisé d'un user
     public function updateUserQuotaUsed(int $targetUserId, int $newQuotaUsed): bool
     {
         $count = $this->db->update('users', [

@@ -44,7 +44,7 @@ class ShareRepository{
     //trouve le partage par le token (donné)
     public function findByToken(string $token): ?array
     {
-         $row = $this->db->get('shares', '*', ['token' => $token]);
+        $row = $this->db->get('shares', '*', ['token' => $token]);
         return $row ?: null;
     }
 

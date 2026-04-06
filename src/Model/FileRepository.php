@@ -114,7 +114,7 @@ class FileRepository
     {
         
         $total = $this->db->sum('file_versions',[
-            '[>]files' => ['file_versions.file_id' => 'id'],
+            '[>]files' => ['file_versions.file_id' => 'id'], //LEFT JOIN files ON file_versions.file_id = files.id
         ], 'file_versions.size',
         [
             'files.user_id' => $userId
@@ -123,7 +123,7 @@ class FileRepository
         return (int)($total ?? 0);
     }
 
-    // derniers uploads d'un user
+    // derniers (20) uploads d'un user
     public function recentUploads(int $userId, int $limit = 20): array
     {
          return $this->db->select('files', '*', [
@@ -189,7 +189,7 @@ class FileRepository
         }
 
         $count = (int)$this->db->count('files', $where);
-        return $count > 0;
+        return $count > 0; // true => le nom n'est pas disponible, il y a déjà au moins 1 fichier avec les mêmes user, folder_id, original_name
     }
 
 
@@ -268,7 +268,7 @@ class FileRepository
         ];
     }
 
-    //retourne les version d'un fichier en pagination pour partage
+    //retourne les versions d'un fichier en pagination pour partage
     public function listVersionsForShare(int $fileId, int $limit = 20, int $offset = 0): array
     {
         $limit = max(1, min(100, $limit));
@@ -363,7 +363,7 @@ class FileRepository
         return $version ?: null;
     }
 
-    //suppression la version de la bdd
+    //suppression la version spécifique de la bdd
     public function deleteVersion(int $versionId): bool
     {
         $result = $this->db->delete('file_versions', ['id' => $versionId]);
@@ -375,7 +375,7 @@ class FileRepository
         return $this->db->select('file_versions', '*', ['file_id' => $fileId]);
     }
 
-    //supprime toutes les versions 
+    //supprime toutes les versions d'un file
     public function deleteAllVersions(int $fileId): bool
     {
         $result = $this->db->delete('file_versions', ['file_id' => $fileId]);

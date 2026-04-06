@@ -46,7 +46,16 @@ class ShareController{
         $this->auth = new AuthService($db, $this->jwtSecret);
     }
 
+    /**
+     * créer une réponse JSON standardisée
+    * @param Response $response
+    * @param array $data
+    * @param int $status
+    * @return Response
+    */
     private function json(Response $response, array $data, int $status): Response{
+
+        //['error' => 'Not found'] en JSON {"error":"Not found"}
         $response->getBody()->write(json_encode($data, JSON_PRETTY_PRINT));
         return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
     }
@@ -467,7 +476,7 @@ class ShareController{
         $shareId = (int)($args['id'] ?? 0);
 
         if ($shareId <= 0) {
-            return $this->json($response, ['error' => 'ID invalide'], 400);
+            return $this->json($response, ['error' => 'Id partage invalide'], 400);
         }
 
         try{
@@ -697,13 +706,15 @@ class ShareController{
 
         //vérif que ZIP a été créé
         if(!file_exists($zipPath)){
-             $message = 'Erreur lors de la création du ZIP';
+            $message = 'Erreur lors de la création du ZIP';
             $this->logs->log($shareId, null, $ip, $userAgent, false, $message);
             return $this->json($response, ['error' => $message], 500);
         }
 
         //récup la taille AVANT supprimer le fichier temporaire
         $zipSize = filesize($zipPath);
+
+        // autorisé: [^a-zA-Z0-9_-] => les autres remplacés par _ => pour éviter les problèmes d'encodage dans le header Content-Disposition
         $zipFilename = preg_replace('/[^a-zA-Z0-9_-]/', '_', $folder['name']) . '.zip';
 
         //logger le succès
@@ -829,7 +840,7 @@ class ShareController{
                 unset($ciphertext);
             }catch (\Throwable $e){
                 $message = $e->getMessage();
-                error_log('Decrypt failed (publicDownload): ' . $message);
+                error_log('Échec déchiffrement (publicDownload): ' . $message);
                 $this->logs->log($shareId, $versionId, $ip, $userAgent, false, 'Échec déchiffrement (500): ' . $message);
                 return $this->json($response, ['error' => $message], 500);
             }
@@ -950,8 +961,11 @@ class ShareController{
         }
 
         $params = $request->getQueryParams();
-        $limit = isset($params['limit']) ? (int)$params['limit'] : 20;
-        $offset = isset($params['offset']) ? (int)$params['offset'] : 0;
+        // $limit = isset($params['limit']) ? (int)$params['limit'] : 20;
+        // $offset = isset($params['offset']) ? (int)$params['offset'] : 0;
+
+        $limit = isset($params['limit']) ? min(100, max(1, (int)$params['limit'])) : 20; // garantir: 1 < limit < 20
+        $offset = isset($params['offset']) ? max(0, (int)$params['offset']) : 0;
 
         $res = $this->files->listVersionsForShare($fileId, $limit, $offset);
 
