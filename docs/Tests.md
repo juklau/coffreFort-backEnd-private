@@ -10,11 +10,11 @@ Les 4 contrôleurs principaux de l'API REST :
 
 | Contrôleur | Fichier de test | Tests |
 |---|---|---|
-| UserController | UserControllerTest.php | 15 |
+| UserController | UserControllerTest.php | 16 |
 | FileController | FileControllerTest.php | 10 |
 | ShareController | ShareControllerTest.php | 13 |
 | AdminController | AdminControllerTest.php | 11 |
-| **Total** | | **49** |
+| **Total** | | **50** |
 
 ### Ce qui n'est pas testé (et pourquoi)
 
@@ -68,7 +68,7 @@ Le tableau ci-dessous détaille pour chaque test : le scénario exact simulé et
 
 ## Tests par contrôleur
 
-### UserController — 15 tests
+### UserController — 16 tests
 
 **POST /auth/register**
 
@@ -85,6 +85,7 @@ Le tableau ci-dessous détaille pour chaque test : le scénario exact simulé et
 |---|---|---|
 | `testLoginSuccess` | Email et mot de passe corrects — mock retourne l'utilisateur avec le bon hash | 200 |
 | `testLoginInvalidEmail` | Email malformé, rejeté avant toute requête DB | 400 |
+| `testLoginShortPassword` |  Mot de passe trop court (`short`) | 400 |
 | `testLoginUserNotFound` | Email valide mais mock retourne `null` (utilisateur inexistant) | 401 |
 | `testLoginWrongPassword` | Mock retourne un hash différent du mot de passe fourni | 401 |
 
@@ -340,7 +341,7 @@ $this->database->shouldReceive('update')->andReturn(null);
 
 ## Généraliser les tests à l'ensemble du backend
 
-Les 49 tests actuels couvrent les contrôleurs. Pour étendre la couverture à l'ensemble du backend, voici les étapes à suivre :
+Les 50 tests actuels couvrent les contrôleurs. Pour étendre la couverture à l'ensemble du backend, voici les étapes à suivre :
 
 ### 1. Tester les Repositories
 

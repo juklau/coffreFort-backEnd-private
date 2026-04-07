@@ -79,7 +79,7 @@ class UserControllerTest extends BaseTestCase
         $response = $this->createResponse();
         $request = $this->createPostRequest('/auth/register', [
             'email' => 'newuser@example.com',
-            'password' => 'SecurePassword123'
+            'password' => 'SecurePassword123!'
         ]);
 
         // Mock - pas d'utilisateur existant
@@ -118,7 +118,7 @@ class UserControllerTest extends BaseTestCase
         $response = $this->createResponse();
         $request = $this->createPostRequest('/auth/register', [
             'email' => 'invalid-email',
-            'password' => 'SecurePassword123'
+            'password' => 'SecurePassword123!'
         ]);
 
         $result = $this->userController->register($request, $response);
@@ -137,7 +137,7 @@ class UserControllerTest extends BaseTestCase
         $response = $this->createResponse();
         $request = $this->createPostRequest('/auth/register', [
             'email' => 'newuser@example.com',
-            'password' => 'short'
+            'password' => 'short1!'
         ]);
 
         $result = $this->userController->register($request, $response);
@@ -156,7 +156,7 @@ class UserControllerTest extends BaseTestCase
         $response = $this->createResponse();
         $request = $this->createPostRequest('/auth/register', [
             'email' => 'existing@example.com',
-            'password' => 'SecurePassword123'
+            'password' => 'SecurePassword123!'
         ]);
 
         // Mock - utilisateur déjà existant
@@ -181,8 +181,8 @@ class UserControllerTest extends BaseTestCase
     {
         $response = $this->createResponse();
         $request = $this->createPostRequest('/auth/login', [
-            'email' => 'user@example.com',
-            'password' => 'SecurePassword123'
+            'email'    => 'user@example.com',
+            'password' => 'SecurePass123!'
         ]);
 
         // Mock - trouver l'utilisateur
@@ -190,7 +190,7 @@ class UserControllerTest extends BaseTestCase
             ->andReturn([
                 'id' => 1,
                 'email' => 'user@example.com',
-                'pass_hash' => password_hash('SecurePassword123', PASSWORD_DEFAULT),
+                'pass_hash' => password_hash('SecurePass123!', PASSWORD_DEFAULT),
                 'is_admin' => 0
             ]);
 
@@ -210,12 +210,33 @@ class UserControllerTest extends BaseTestCase
         $response = $this->createResponse();
         $request = $this->createPostRequest('/auth/login', [
             'email' => 'invalid-email',
-            'password' => 'SecurePassword123'
+            'password' => 'SecurePass123!'
         ]);
 
         $result = $this->userController->login($request, $response);
 
         $this->assertEquals(400, $result->getStatusCode());
+        $data = $this->getResponseData($result);
+        $this->assertArrayHasKey('error', $data);
+    }
+
+    /**
+     * Test : Connexion avec mot de passe trop court (< 12 caractères)
+     * POST /auth/login
+     * Nouveau test — la validation min 12 chars bloque avant la requête DB
+     */
+    public function testLoginShortPassword(): void
+    {
+        $response = $this->createResponse();
+        $request = $this->createPostRequest('/auth/login', [
+            'email'    => 'user@example.com',
+            'password' => 'Short1!'          
+        ]);
+
+        // pas de mock DB — la validation bloque avant toute requête
+        $result = $this->userController->login($request, $response);
+
+        $this->assertEquals(401, $result->getStatusCode());
         $data = $this->getResponseData($result);
         $this->assertArrayHasKey('error', $data);
     }
@@ -229,7 +250,7 @@ class UserControllerTest extends BaseTestCase
         $response = $this->createResponse();
         $request = $this->createPostRequest('/auth/login', [
             'email' => 'nonexistent@example.com',
-            'password' => 'SecurePassword123'
+            'password' => 'SecurePass123!'
         ]);
 
         // Mock - utilisateur non trouvé
@@ -252,7 +273,7 @@ class UserControllerTest extends BaseTestCase
         $response = $this->createResponse();
         $request = $this->createPostRequest('/auth/login', [
             'email' => 'user@example.com',
-            'password' => 'WrongPassword123'
+            'password' => 'SecurePass123!'
         ]);
 
         // Mock - trouver l'utilisateur avec un hash différent

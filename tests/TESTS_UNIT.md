@@ -9,13 +9,13 @@ tests/
 ├── BaseTestCase.php                    # Classe de base commune à tous les tests
 └── unit/
     └── Controller/
-        ├── UserControllerTest.php      # 15 tests — authentification, utilisateurs
+        ├── UserControllerTest.php      # 16 tests — authentification, utilisateurs
         ├── FileControllerTest.php      # 10 tests — fichiers, dossiers, quota
         ├── ShareControllerTest.php     # 13 tests — partages publics/privés
         └── AdminControllerTest.php     # 11 tests — administration (quotas, suppression)
 ```
 
-**Total : 49 tests**
+**Total : 50 tests**
 
 ## Pourquoi ces tests ?
 
@@ -74,7 +74,7 @@ Créer `phpunit.xml` à la racine du projet avant tout lancement :
 ./vendor/bin/phpunit --filter testLoginSuccess
 
 # Rapport visuel détaillé (script inclus)
-php test-report.php
+php test-report-detailed.php
 
 # Couverture de code (HTML)
 ./vendor/bin/phpunit --coverage-html coverage/
@@ -83,7 +83,7 @@ php test-report.php
 ## Résultats attendus
 
 ```
-OK (49 tests, XX assertions)
+OK (50 tests, XX assertions)
 ```
 
 Si des warnings Mockery apparaissent (`OK, but there were issues!`), les tests passent quand même — voir `docs/TESTS.md` pour les corriger.
@@ -92,7 +92,7 @@ Si des warnings Mockery apparaissent (`OK, but there were issues!`), les tests p
 
 | Contrôleur | Routes couvertes | Tests |
 |---|---|---|
-| UserController | POST /auth/register, POST /auth/login, GET /users, GET /users/{id}, GET /dashboard | 15 |
+| UserController | POST /auth/register, POST /auth/login, GET /users, GET /users/{id}, GET /dashboard | 16 |
 | FileController | GET /files, GET /files/{id}, GET /folders, POST /folders, PUT /folders/{id}, DELETE /folders/{id}, GET /files/{id}/versions, GET /me/quota | 10 |
 | ShareController | POST /shares, GET /shares, GET /shares/{id}, DELETE /shares/{id}, PATCH /shares/{id}/revoke, GET /s/{token}, GET /s/{token}/versions | 13 |
 | AdminController | GET /admin/users/quotas, PUT /admin/users/{id}/quota, DELETE /admin/users/{id} | 11 |

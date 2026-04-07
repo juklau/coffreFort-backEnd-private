@@ -49,18 +49,58 @@ class UserController
             return $this->json($response, ['error' => 'Email et un mot de passe sont requis'], 400);
         }
 
-        // Validation de l'email
-        if (!filter_var($body['email'], FILTER_VALIDATE_EMAIL)) {
+        // Validation et nettoyage de l'email
+        $email = trim($body['email']);
+
+        //longeur maximal pour éviter les attaques par déni de service
+        if (strlen($email) > 255) {
+            return $this->json($response, ['error' => 'Email trop long (maximum 255 caractères)'], 400);
+        }
+
+        // format email valide (RFC 5322 via FILTER_VALIDATE_EMAIL)
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return $this->json($response, ['error' => "Format d'e-mail invalide"], 400);
         }
 
-        // Validation du mot de passe (minimum 8 caractères)
-        if (strlen($body['password']) < 8) {
-            return $this->json($response, ['error' => 'Le mot de passe doit comporter au moins 8 caractères'], 400);
+        // normalisation  => lowercase pour éviter les doublons
+        $email = strtolower($email);
+
+        // Validation du mot de passe 
+        $password = $body['password'];
+
+        // min. 12 caractères
+        if (strlen($password) < 12) {
+            return $this->json($response, ['error' => 'Le mot de passe doit comporter au moins 12 caractères'], 400);
         }
 
+        // longueur maximale => éviter les attaques bcrypt avec mots de passe géants
+        if (strlen($password) > 128) {
+            return $this->json($response, ['error' => 'Le mot de passe ne peut pas dépasser 128 caractères'], 400);
+        }
+
+        // au moins une lettre majuscule
+        if (!preg_match('/[A-Z]/', $password)) {
+            return $this->json($response, ['error' => 'Le mot de passe doit contenir au moins une lettre majuscule'], 400);
+        }
+
+        // au moins une lettre minuscule
+        if (!preg_match('/[a-z]/', $password)) {
+            return $this->json($response, ['error' => 'Le mot de passe doit contenir au moins une lettre minuscule'], 400);
+        }
+
+        // au moins un chiffre
+        if (!preg_match('/[0-9]/', $password)) {
+            return $this->json($response, ['error' => 'Le mot de passe doit contenir au moins un chiffre'], 400);
+        }
+
+        // au moins un caractère spécial
+        if (!preg_match('/[\W_]/', $password)) {
+            return $this->json($response, ['error' => 'Le mot de passe doit contenir au moins un caractère spécial (!@#$%^&*...)'], 400);
+        }
+
+
         // Vérifier si l'email existe déjà
-        if ($this->users->findByEmail($body['email'])) {
+        if ($this->users->findByEmail($email)) {
             return $this->json($response, ['error' => 'Email existe deja'], 409);
         }
 
@@ -69,8 +109,8 @@ class UserController
 
         // Créer l'utilisateur
         $userData = [
-            'email'         => $body['email'],
-            'pass_hash'     => password_hash($body['password'], PASSWORD_DEFAULT),
+            'email'         => $email,
+            'pass_hash'     => password_hash($email, PASSWORD_DEFAULT),
             'quota_used'    => 0,
             'quota_total'   => isset($body['quota_total']) ? (int)$body['quota_total'] : 1073741824, // 1GB par défaut
             // 'quota_total'   => isset($body['quota_total']) ? (int)$body['quota_total'] : 31457280, // 30 Mo par défaut pour tests
@@ -83,7 +123,7 @@ class UserController
         $response->getBody()->write(json_encode([
             'message'   => 'Utilisateur créé',
             'id'        => $id,
-            'email'     => $body['email'],
+            'email'     => $email,
             'is_admin'  => $isAdmin
         ], JSON_PRETTY_PRINT));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
@@ -100,17 +140,41 @@ class UserController
             return $this->json($response, ['error' => 'Email et un mot de passe sont requis'], 400);
         }
 
-        // Validation basique (anti XSS)
-        $email = filter_var(trim($body['email']), FILTER_VALIDATE_EMAIL);
+        //validation et nettoyage de l'email
+        $email = trim($body['email'] ?? '');
+
+        if (strlen($email) > 255) {
+            return $this->json($response, ['error' => 'Email trop long'], 400);
+        }
+
+        // Validation basique pour éviter les caractères comme < ou >
+        $email = filter_var($email, FILTER_VALIDATE_EMAIL);
         if (!$email) {
             return $this->json($response, ['error' => "Format d'email invalide"], 400);
         }
 
-        // Recherche de l'utilisateur par email
-        $user = $this->users->findByEmail($body['email']);
+        // normalisation : lowercase (cohérent avec le register)
+        $email = strtolower($email);
+
+        // validation basique du mot de passe 
+        $password = $body['password'] ?? '';
+
+        // longueur minimale — évite des requêtes DB inutiles avec un mot de passe vide
+        if (strlen($password) < 12) {
+            return $this->json($response, ['error' => 'Mot de passe invalide'], 401);
+        }
+
+        // longueur maximale — protection contre les attaques bcrypt
+        if (strlen($password) > 128) {
+            return $this->json($response, ['error' => 'Mot de passe invalide'], 401);
+        }
+
+         // Recherche de l'utilisateur par email
+        $user = $this->users->findByEmail($email);
         if (!$user) {
             return $this->json($response, ['error' => 'Utilisateur avec cet email n\'existe pas'], 401);
         }
+
 
         // Vérification du mot de passe
         if (!password_verify($body['password'], $user['pass_hash'])) {
@@ -138,6 +202,7 @@ class UserController
         // Réponse
         return $this->json($response, ['jwt' => $jwt], 200);
     }
+
 
     // GET /users - Liste tous les utilisateurs que pour admin ********************************************************************** OK
     public function list(Request $request, Response $response): Response

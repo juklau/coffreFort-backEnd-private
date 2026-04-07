@@ -1,11 +1,11 @@
 {
     "status": "success",
     "summary": {
-        "total": 49,
-        "passed": 49,
+        "total": 50,
+        "passed": 50,
         "failures": 0,
         "errors": 0,
-        "warnings": 0
+        "warnings": 9
     },
     "errors": [],
     "failures": []
