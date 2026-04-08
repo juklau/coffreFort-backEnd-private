@@ -13,7 +13,8 @@
         "slim/slim": "^4.12",
         "slim/psr7": "^1.8",
         "catfan/medoo": "^2.2",
-        "firebase/php-jwt": "^6.11"
+        "firebase/php-jwt": "^6.11",
+        "phpmailer/phpmailer": "^7.0"
     },
     "config": {
         "audit": {

@@ -110,7 +110,8 @@ class UserController
         // Créer l'utilisateur
         $userData = [
             'email'         => $email,
-            'pass_hash'     => password_hash($email, PASSWORD_DEFAULT),
+            // 'pass_hash'     => password_hash($password, PASSWORD_DEFAULT),
+            'pass_hash'     => password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]), // bcrypt avec un coût de 12 (plus sécurisé que le défaut de 10)
             'quota_used'    => 0,
             'quota_total'   => isset($body['quota_total']) ? (int)$body['quota_total'] : 1073741824, // 1GB par défaut
             // 'quota_total'   => isset($body['quota_total']) ? (int)$body['quota_total'] : 31457280, // 30 Mo par défaut pour tests
@@ -174,7 +175,8 @@ class UserController
         if (!$user) {
             return $this->json($response, ['error' => 'Utilisateur avec cet email n\'existe pas'], 401);
         }
-
+        error_log("body['password']: " . $body['password']);
+        error_log("user['pass_hash']: " . $user['pass_hash']);
 
         // Vérification du mot de passe
         if (!password_verify($body['password'], $user['pass_hash'])) {
@@ -306,6 +308,8 @@ class UserController
         
         return $response->withHeader("Content-Type", "application/json");
     }
+
+
 
 }
 

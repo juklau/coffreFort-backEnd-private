@@ -713,7 +713,7 @@ tests/
 ├── BaseTestCase.php
 └── unit/
     └── Controller/
-        ├── UserControllerTest.php      # 15 tests
+        ├── UserControllerTest.php      # 16 tests
         ├── FileControllerTest.php      # 10 tests
         ├── ShareControllerTest.php     # 13 tests
         └── AdminControllerTest.php     # 11 tests
@@ -789,7 +789,7 @@ Créer `phpunit.xml` à la racine du projet :
 
 Résultat attendu :
 ```
-OK (49 tests, XX assertions)
+OK (50 tests, XX assertions)
 ```
 
 > Si des warnings Mockery apparaissent (`OK, but there were issues!`), les tests passent quand même. Voir `docs/TESTS.md` pour les corriger.
@@ -798,7 +798,7 @@ OK (49 tests, XX assertions)
 
 | Contrôleur | Routes couvertes | Tests |
 |---|---|---|
-| `UserControllerTest` | POST /auth/register, POST /auth/login, GET /users, GET /users/{id}, GET /dashboard | 15 |
+| `UserControllerTest` | POST /auth/register, POST /auth/login, GET /users, GET /users/{id}, GET /dashboard | 16 |
 | `FileControllerTest` | GET /files, GET /files/{id}, GET /folders, POST /folders, PUT /folders/{id}, DELETE /folders/{id}, GET /files/{id}/versions, GET /me/quota | 10 |
 | `ShareControllerTest` | POST /shares, GET /shares, GET /shares/{id}, DELETE /shares/{id}, PATCH /shares/{id}/revoke, GET /s/{token}, GET /s/{token}/versions | 13 |
 | `AdminControllerTest` | GET /admin/users/quotas, PUT /admin/users/{id}/quota, DELETE /admin/users/{id} | 11 |
@@ -992,7 +992,7 @@ docker compose down && docker compose up -d --build
 
 Modifier dans `UserController::login()` :
 ```php
-'exp' => time() + 3600,  // 1 heure
+'exp' => time() + 900,  // 15 minutes
 ```
 
 ### 5. Triggers MySQL — accès root requis
@@ -1038,15 +1038,15 @@ docker exec -it coffreFort-db-private mysql -uroot -proot coffreFort
 - [x] Table audit_logs
 - [x] 38 routes testées (Postman + PHPUnit)
 - [x] CASCADE automatique
-- [x] 49 tests unitaires (4 contrôleurs)
+- [x] 50 tests unitaires (4 contrôleurs)
 - [x] Backup & restauration automatisés (CRON)
 
 ### Version 2.0 (En cours)
+- [ ] Fonctionnalité "Mot de passe oublié"
+- [ ] Renforcement politique mots de passe
 - [ ] Protection bruteforce (rate limiting)
 - [ ] Déplacement dossiers/fichiers
 - [ ] Triggers supplémentaires pour audit_logs
-- [ ] Fonctionnalité "Mot de passe oublié"
-- [ ] Renforcement politique mots de passe
 - [ ] Extension tests : repositories, services, intégration
 
 ### Version 3.0 (Futur)
@@ -1067,4 +1067,4 @@ docker exec -it coffreFort-db-private mysql -uroot -proot coffreFort
 **Dernière mise à jour** : 25 mars 2026
 
 **Version API** : 1.0.0
-**Routes testées** : 38/38 ✅ | **Tests unitaires** : 49/49 ✅
+**Routes testées** : 38/38 ✅ | **Tests unitaires** : 50/50 ✅
