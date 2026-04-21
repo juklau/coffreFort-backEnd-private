@@ -917,8 +917,8 @@ docker ps
 
 | Service | URL | Description |
 |---|---|---|
-| API Backend | `http://localhost:9083` | API REST Slim |
-| API Backend | `https://cryptovault.iris.a3n.fr:4433/` | API REST Slim |
+| API Backend | `http://localhost:9083` | API REST Slim (environnement local)|
+| API Backend | `https://cryptovault.iris.a3n.fr:4433/` | API REST Slim (production HTTPS)|
 | WebDB | `http://localhost:22071` | Interface d'administration BDD |
 | MySQL | `localhost:3306` | Accessible depuis l'hôte |
 
@@ -980,9 +980,9 @@ Puis rebuild :
 docker compose down && docker compose up -d --build
 ```
 
-### 3. `parent_id` — contrainte FOREIGN KEY
+### 3. `parent_id` — gestion des dossiers racines
 
-> Non implémenté (v2) — `parent_id` doit être `null` pour les dossiers racines :
+Pour créer un dossier à la racine, il faut définir `parent_id` à `null` ou ne pas le fournir :
 
 ```json
 { "name": "Racine", "parent_id": null }
@@ -1040,10 +1040,10 @@ docker exec -it coffreFort-db-private mysql -uroot -proot coffreFort
 - [x] CASCADE automatique
 - [x] 50 tests unitaires (4 contrôleurs)
 - [x] Backup & restauration automatisés (CRON)
+- [x] Renforcement politique mots de passe
 
 ### Version 2.0 (En cours)
 - [ ] Fonctionnalité "Mot de passe oublié"
-- [ ] Renforcement politique mots de passe
 - [ ] Protection bruteforce (rate limiting)
 - [ ] Déplacement dossiers/fichiers
 - [ ] Triggers supplémentaires pour audit_logs
@@ -1064,7 +1064,7 @@ docker exec -it coffreFort-db-private mysql -uroot -proot coffreFort
 
 ---
 
-**Dernière mise à jour** : 25 mars 2026
+**Dernière mise à jour** : 21 avril 2026
 
 **Version API** : 1.0.0
 **Routes testées** : 38/38 ✅ | **Tests unitaires** : 50/50 ✅
