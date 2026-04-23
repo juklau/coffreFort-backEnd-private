@@ -1,7 +1,5 @@
 /vendor/
 .env
-backup.sh
-restore.sh
 
 storage/uploads/*
 
@@ -13,8 +11,30 @@ init_triggers.sql
 init.sql
 init_triggers_V1.sql
 
+backup.sh
+restore.sh
+
+backup_serveur.sh
+restore_serveur_isoled.sh
+restore_serveur.sh
+
 backups
 restores
 
 ###> il faut enlever le suivi sur github sinon il écrase le .env de prod###
 docker-compose.yml
+
+# Fichiers Claude/Byan
+_byan/
+_byan-output/
+.claude/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Éditeurs
+.vscode/
+.idea/
+
+.github/agents/
