@@ -275,7 +275,7 @@ BEGIN
             'quota_used', OLD.quota_used,
             'was_admin', OLD.is_admin,
             'created_at', OLD.created_at,
-            'reason', 'RGPD - Droit à l\'effacement'
+            'reason', "RGPD - Droit à l\'effacement"
         )
     );
 END;
